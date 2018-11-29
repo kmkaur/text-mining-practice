@@ -19,5 +19,4 @@ practice_species %>%
   filter(V2%in% ant_list$ants)
 
 practice_species %>%
-  filter(V2%in% angiosperms_list$current.valid.name)
-
+  filter(V2%in% angiosperms_list$plants)
