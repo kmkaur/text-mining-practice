@@ -2,6 +2,7 @@
 
 #load packages
 library(dplyr)
+library(taRifx)
 
 #set working directory
 setwd("~/Desktop")
