@@ -24,11 +24,11 @@ practice_species <- read.csv("test_species2.csv", header=FALSE)
 #remove abstracts that had only one species appear
 practice_species2 <- practice_species[practice_species$V1 %in% practice_species$V1[duplicated(practice_species$V1)],]
 
-#sort into two lists, one with the ants that appeared and one witht the plants
+#sort into two lists, one with the ants that appeared and one with the plants
 ants_prac <- practice_species2 %>% filter(V2 %in% ant_list$ants)
-ants_prac <- remove.factors(ants_tm)
+ants_prac <- remove.factors(ants_prac)
 plants_prac <- practice_species2 %>% filter(V2%in% angiosperms_list$plants)
-plants_prac <- remove.factors(plants_tm)
+plants_prac <- remove.factors(plants_prac)
 
 #merge into one table, with the columns abstracts, ants, plants
 together_prac <- merge(ants_prac, plants_prac, by="V1")
