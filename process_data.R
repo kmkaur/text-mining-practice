@@ -79,8 +79,8 @@ plants_efn <- remove.factors(plants_efn)
 together_efn <- merge(ants_efn, plants_efn, by="abs")
 colnames(together_efn) <- c("abs", "ants", "plants")
 
-write.csv(ants_efn, file = "seed_dispersal_ants.csv")
-write.csv(plants_efn, file = "seed_dispersal_plants.csv")
+write.csv(ants_efn, file = "efn_ants.csv")
+write.csv(plants_efn, file = "efn_plants.csv")
 
 together_efn$abs <- NULL
 
@@ -98,8 +98,8 @@ ants_dom <- remove.factors(ants_dom)
 plants_dom <- dom_network2 %>% filter(name %in% angiosperms_list$plants)
 plants_dom <- remove.factors(plants_dom)
 
-write.csv(ants_dom, file = "seed_dispersal_ants.csv")
-write.csv(plants_dom, file = "seed_dispersal_plants.csv")
+write.csv(ants_dom, file = "domatia_ants.csv")
+write.csv(plants_dom, file = "domatia_plants.csv")
 
 together_dom <- merge(ants_dom, plants_dom, by="abs")
 colnames(together_dom) <- c("abs", "ants", "plants")
