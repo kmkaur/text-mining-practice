@@ -64,7 +64,7 @@ efn_tidy_table2 <- efn_tidy_table %>%
 write.csv(efn_tidy_table2, file = "efn_network_tm_processed.csv")
 
 #####Domatia#####
-dom_raw <- read.csv(file = "dom_network_tm_raw.csv", header = TRUE)
+dom_raw <- read.csv(file = "dom_network_tm_raw_2.csv", header = TRUE)
 
 dom_tidy_table <- 
   dom_raw %>%
@@ -76,6 +76,6 @@ dom_tidy_table$species <- NULL
 
 dom_tidy_table2 <- dom_tidy_table %>% 
   do(na.locf(.))
-write.csv(dom_tidy_table2, file = "dom_network_tm_processed.csv")
+write.csv(dom_tidy_table2, file = "dom_network_tm_processed_2.csv")
 
 
