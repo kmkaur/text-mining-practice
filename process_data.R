@@ -98,8 +98,8 @@ ants_dom <- remove.factors(ants_dom)
 plants_dom <- dom_network2 %>% filter(name %in% angiosperms_list$plants)
 plants_dom <- remove.factors(plants_dom)
 
-write.csv(ants_dom, file = "domatia_ants.csv")
-write.csv(plants_dom, file = "domatia_plants.csv")
+#write.csv(ants_dom, file = "domatia_ants.csv")
+#write.csv(plants_dom, file = "domatia_plants.csv")
 
 together_dom <- merge(ants_dom, plants_dom, by="abs")
 colnames(together_dom) <- c("abs", "ants", "plants")
@@ -108,5 +108,5 @@ together_dom$abs <- NULL
 
 final_table_dom <- table(together_dom)
 final_table_dom <- (final_table_dom > 0) + 0
-write.csv(final_table_dom, file = "dom_01_network.csv")
+#write.csv(final_table_dom, file = "dom_01_network.csv")
 
