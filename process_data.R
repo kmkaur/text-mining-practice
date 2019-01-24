@@ -45,7 +45,7 @@ final_table_prac <- (final_table_prac > 0) + 0
 #mat <- matrix(NA, nrow = 8, ncol = 4, dimnames = list(c(ants_tm$V2), c(plants_tm$V2)))
 
 #####Seed dispersal#####
-sd_network <- read.csv("sd_network_tm_processed.csv", header=TRUE)
+sd_network <- read.csv("sd_network_tm_processed_2.csv", header=TRUE)
 sd_network2 <- sd_network[sd_network$abs %in% sd_network$abs[duplicated(sd_network$abs)],]
 sd_network2$X <- NULL
 
@@ -54,8 +54,8 @@ ants_sd <- remove.factors(ants_sd)
 plants_sd <- sd_network2 %>% filter(name %in% angiosperms_list$plants)
 plants_sd <- remove.factors(plants_sd)
 
-write.csv(ants_sd, file = "seed_dispersal_ants.csv")
-write.csv(plants_sd, file = "seed_dispersal_plants.csv")
+write.csv(ants_sd, file = "seed_dispersal_ants_2.csv")
+write.csv(plants_sd, file = "seed_dispersal_plants_2.csv")
 
 together_sd <- merge(ants_sd, plants_sd, by="abs")
 colnames(together_sd) <- c("abs", "ants", "plants")
@@ -67,7 +67,7 @@ final_table_sd <- (final_table_sd > 0) + 0
 write.csv(final_table_sd, file = "sd_01_network.csv")
 
 #####Extrafloral nectar#####
-efn_network <- read.csv("efn_network_tm_processed.csv", header=TRUE)
+efn_network <- read.csv("efn_network_tm_processed_2.csv", header=TRUE)
 efn_network2 <- efn_network[efn_network$abs %in% efn_network$abs[duplicated(efn_network$abs)],]
 efn_network2$X <- NULL
 
@@ -79,8 +79,8 @@ plants_efn <- remove.factors(plants_efn)
 together_efn <- merge(ants_efn, plants_efn, by="abs")
 colnames(together_efn) <- c("abs", "ants", "plants")
 
-write.csv(ants_efn, file = "efn_ants.csv")
-write.csv(plants_efn, file = "efn_plants.csv")
+write.csv(ants_efn, file = "efn_ants_2.csv")
+write.csv(plants_efn, file = "efn_plants_2.csv")
 
 together_efn$abs <- NULL
 
@@ -89,7 +89,7 @@ final_table_efn <- (final_table_efn > 0) + 0
 write.csv(final_table_efn, file = "efn_01_network.csv")
 
 #####Domatia#####
-dom_network <- read.csv("dom_network_tm_processed.csv", header=TRUE)
+dom_network <- read.csv("dom_network_tm_processed_2.csv", header=TRUE)
 dom_network2 <- dom_network[dom_network$abs %in% dom_network$abs[duplicated(dom_network$abs)],]
 dom_network2$X <- NULL
 
@@ -98,8 +98,8 @@ ants_dom <- remove.factors(ants_dom)
 plants_dom <- dom_network2 %>% filter(name %in% angiosperms_list$plants)
 plants_dom <- remove.factors(plants_dom)
 
-#write.csv(ants_dom, file = "domatia_ants.csv")
-#write.csv(plants_dom, file = "domatia_plants.csv")
+write.csv(ants_dom, file = "domatia_ants_2.csv")
+write.csv(plants_dom, file = "domatia_plants_2.csv")
 
 together_dom <- merge(ants_dom, plants_dom, by="abs")
 colnames(together_dom) <- c("abs", "ants", "plants")
@@ -108,5 +108,5 @@ together_dom$abs <- NULL
 
 final_table_dom <- table(together_dom)
 final_table_dom <- (final_table_dom > 0) + 0
-#write.csv(final_table_dom, file = "dom_01_network.csv")
+write.csv(final_table_dom, file = "dom_01_network.csv")
 
