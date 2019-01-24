@@ -34,7 +34,7 @@ tidy_table2 <- tidy_table %>%
 #done! ready for process_data.R file to make 0 and 1 matrix
 
 #####Seed dispersal#####
-sd_raw <- read.csv(file = "sd_network_tm_raw.csv", header = TRUE)
+sd_raw <- read.csv(file = "sd_network_tm_raw_2.csv", header = TRUE)
 
 sd_tidy_table <- 
       sd_raw %>%
@@ -46,10 +46,10 @@ sd_tidy_table$species <- NULL
 
 sd_tidy_table2 <- sd_tidy_table %>% 
                   do(na.locf(.))
-write.csv(sd_tidy_table2, file = "sd_network_tm_processed.csv")
+write.csv(sd_tidy_table2, file = "sd_network_tm_processed_2.csv")
 
 #####Extrafloral nectar#####
-efn_raw <- read.csv(file = "efn_network_tm_raw.csv", header = TRUE)
+efn_raw <- read.csv(file = "efn_network_tm_raw_2.csv", header = TRUE)
 
 efn_tidy_table <- 
   efn_raw %>%
@@ -61,7 +61,7 @@ efn_tidy_table$species <- NULL
 
 efn_tidy_table2 <- efn_tidy_table %>% 
   do(na.locf(.))
-write.csv(efn_tidy_table2, file = "efn_network_tm_processed.csv")
+write.csv(efn_tidy_table2, file = "efn_network_tm_processed_2.csv")
 
 #####Domatia#####
 dom_raw <- read.csv(file = "dom_network_tm_raw_2.csv", header = TRUE)
