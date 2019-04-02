@@ -19,64 +19,53 @@ that one of the partners ‘speciates’ (splits into two new species); as a res
 We have written computer code to “read” through thousands and thousands of scientific abstracts and pull out information on which ant species are involved in mutualistic interactions with plants (as well as which species of plants). We have then assembled this information into a database so that a network of plant-ant interactions can be built. This network will then be used in the future to address questions regarding whether mutualistic/cooperative interactions
 generate diversity.
 
-## pre_process data blurb
-
-
 ## Packages used
 ```{r}
 library(tidyr)
-library(diplyr)
+library(dplyr)
 library(zoo)
 library(taRifx)
 ```
 
 ## Setting working directory
 ```{r}
-setwd("~/Desktop")
+setwd("C:/Users/olivi/Documents/GitHub")
 ```
+
+## pre_process data blurb
+
+## SEED DISPERSAL 
 
 ## Separating columns for abstract number and genus and species name
 ## Leaving NA on the left side if the abstract number is missing
-```{r}
-tidy_table <- 
-  tab %>%
-  separate(abs.name, into = c("abs", "genus", "species"), fill = "left")
-```
-
-## Creating new column with full binomial name
-## Then removing the genus and species columns
-```{r}
-tidy_table$name <- paste(tidy_table$genus, tidy_table$species)
-tidy_table$genus <- NULL
-tidy_table$species <- NULL
-```
-
-## Filling in the NA with the abstracts above
-```{r}
-tidy_table2 <- tidy_table %>% 
-  do(na.locf(.))
-```
-
-## Data is now prepared for process_data.R file to make 0 and 1 matrix
-
-## Seed Dispersal 
 ```{r}
 sd_raw <- read.csv(file = "sd_network_tm_raw_2.csv", header = TRUE)
 
 sd_tidy_table <- 
       sd_raw %>%
         separate(abs.name, into = c("abs", "genus", "species"), fill = "left")
+```
 
+## Creating new column with full binomial name
+## Then removing the genus and species columns
+```{r}
 sd_tidy_table$name <- paste(sd_tidy_table$genus, sd_tidy_table$species)
 sd_tidy_table$genus <- NULL
 sd_tidy_table$species <- NULL
+```
 
+## Filling in the NA with the abstracts above
+```{r}
 sd_tidy_table2 <- sd_tidy_table %>% 
                   do(na.locf(.))
 write.csv(sd_tidy_table2, file = "sd_network_tm_processed_2.csv")
 ```
 
-## Extrafloral Nectar 
+## Data is now prepared for process_data.R file to make 0 and 1 matrix
+## Repeat the same processes for the two other characteristics below
+
+
+## EXTRAFLORAL NECTAR
 ```{r}
 efn_raw <- read.csv(file = "efn_network_tm_raw_2.csv", header = TRUE)
 
@@ -93,7 +82,8 @@ efn_tidy_table2 <- efn_tidy_table %>%
 write.csv(efn_tidy_table2, file = "efn_network_tm_processed_2.csv")
 ```
 
-#Domatia
+
+#DOMATIA
 ```{r}
 dom_raw <- read.csv(file = "dom_network_tm_raw_2.csv", header = TRUE)
 
@@ -129,61 +119,52 @@ angiosperms_list <- as.data.frame(read.csv("all_angiosperms.csv", header = TRUE,
 colnames(angiosperms_list) <- "plants"
 ```
 
-## Removing abstracts that had only one species appear 
-```{r}
-practice_species2 <- practice_species[practice_species$V1 %in% practice_species$V1[duplicated(practice_species$V1)],]
-```
 
-## Sorting into two lists, one with the ants that appeared and one with the plants
-```{r}
-ants_prac <- practice_species2 %>% filter(V2 %in% ant_list$ants)
-ants_prac <- remove.factors(ants_prac)
-plants_prac <- practice_species2 %>% filter(V2%in% angiosperms_list$plants)
-plants_prac <- remove.factors(plants_prac)
-```
+## SEED DISPERSAL
 
-## Merging into one table, with the columns abstracts, ants, plants 
-```{r}
-together_prac <- merge(ants_prac, plants_prac, by="V1")
-colnames(together_prac) <- c("abs", "ants", "plants")
-```
-
-## Removing abstract IDs as they are no longer needed
-```{r}
-together_prac$abs <- NULL
-```
-
-## Turning table with two columns into a 0 and 1 matrix
-```{r}
-final_table_prac <- table(together_prac)
-final_table_prac <- (final_table_prac > 0) + 0
-```
-
-## Seed Dispersal
+## Removing abstracts that only have one species appear
 ```{r}
 sd_network <- read.csv("sd_network_tm_processed_2.csv", header=TRUE)
 sd_network2 <- sd_network[sd_network$abs %in% sd_network$abs[duplicated(sd_network$abs)],]
 sd_network2$X <- NULL
+```
 
+## Sorting into two lists, one with the ants that appeared and one with the plants that appeared
+```{r}
 ants_sd <- sd_network2 %>% filter(name %in% ant_list$ants)
 ants_sd <- remove.factors(ants_sd)
 plants_sd <- sd_network2 %>% filter(name %in% angiosperms_list$plants)
 plants_sd <- remove.factors(plants_sd)
+```
 
+## ???
+```{r}
 write.csv(ants_sd, file = "seed_dispersal_ants_2.csv")
 write.csv(plants_sd, file = "seed_dispersal_plants_2.csv")
+```
 
+## Merging into one table with the columns labelled abstracts, ants, and plants
+```{r}
 together_sd <- merge(ants_sd, plants_sd, by="abs")
 colnames(together_sd) <- c("abs", "ants", "plants")
+```
 
+## Removing abstract IDs as they are no longer needed
+```{r}
 together_sd$abs <- NULL
+```
 
+## Turning table with two columns into a ) and 1 matrix
+```{r}
 final_table_sd <- table(together_sd)
 final_table_sd <- (final_table_sd > 0) + 0
 write.csv(final_table_sd, file = "sd_01_network.csv")
 ```
 
-## Extrafloral Nectar
+## Repeat the same processes for the two other characteristics below
+
+
+## EXTRAFLORAL NECTAR
 ```{r}
 efn_network <- read.csv("efn_network_tm_processed_2.csv", header=TRUE)
 efn_network2 <- efn_network[efn_network$abs %in% efn_network$abs[duplicated(efn_network$abs)],]
@@ -207,7 +188,8 @@ final_table_efn <- (final_table_efn > 0) + 0
 write.csv(final_table_efn, file = "efn_01_network.csv")
 ```
 
-## Domatia
+
+## DOMATIA
 ```{r}
 dom_network <- read.csv("dom_network_tm_processed_2.csv", header=TRUE)
 dom_network2 <- dom_network[dom_network$abs %in% dom_network$abs[duplicated(dom_network$abs)],]
