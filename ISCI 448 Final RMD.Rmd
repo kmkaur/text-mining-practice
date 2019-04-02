@@ -31,12 +31,8 @@ library(zoo)
 library(taRifx)
 ```
 
-## Setting working directory
-```{r}
-setwd("C:/Users/olivi/Documents/GitHub")
-```
-
-## pre_process data blurb
+## Step 1: Data Organization 
+First we need to convert the raw data into a more workable format. To do so, we have grouped the ant species and plant species together according to their abstract number for each of the three characteristics. 
 
 ## SEED DISPERSAL 
 
