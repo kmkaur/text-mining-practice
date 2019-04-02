@@ -28,7 +28,7 @@ library(taRifx)
 
 ## Setting working directory
 ```{r}
-setwd("C:/Users/olivi/Documents/GitHub")
+setwd("C:/Users/olivi/Documents/GitHub/text-mining-practice")
 ```
 
 ## pre_process data blurb
