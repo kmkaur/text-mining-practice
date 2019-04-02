@@ -21,7 +21,7 @@ generate diversity.
 ## pre_process data blurb
 
 
-## packages used
+## Packages used
 ```{r}
 library(tidyr)
 library(diplyr)
