@@ -96,7 +96,8 @@ write.csv(dom_tidy_table2, file = "dom_network_tm_processed_2.csv")
 
 
 
-## Process_data blurb
+## Step 2: Format data into 0 and 1 matrix for network analyses.
+After the data is organized, we need to format it into a table with ant species in rows and plant species in columns. Furthermore, when an ant and plant species are found to interact, a 1 must be marked in the table.
 
 ## Loading list of ants and plants to use in sorting the sd, efn, dom lists
 ## Ants
@@ -204,3 +205,4 @@ final_table_dom <- (final_table_dom > 0) + 0
 write.csv(final_table_dom, file = "dom_01_network.csv")
 ```
 
+## All data is now formatted into a 0 and 1 matrix, and is ready for network analyses
