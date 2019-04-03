@@ -13,11 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Species interactions (for example, between plants and their pollinators or predators and their prey) play a major role in shaping both a species’ ecology (their abundance and distribution) and their evolutionary trajectories. 
 
-<<<<<<< HEAD
-In this project, we focus specifically on how these interactions drive evolution over very long time periods (e.g., millions of years). While there is a great deal of theory and empirical evidence supporting the importance of competitive interactions between species on shaping large-scale patterns of evolution, there is relatively little known about how the consequences of engaging in mutualistic/cooperative interactions. Mathematical theory suggests that cooperating with another species should reduce the chance that one of the partners ‘speciates’ (splits into two new species); as a result non-mutualistic species should become more common than the opposite. 
-=======
 In this project, we focus specifically on how these interactions drive evolution over very long time periods (e.g., millions of years). While there is a great deal of theory and empirical evidence supporting the importance of competitive interactions between species on shaping large-scale patterns of evolution, there is relatively little known about how the consequences of engaging in mutualistic/cooperative interactions. Mathematical theory suggests that cooperating with another species should reduce the chance that one of the partners ‘speciates’ (splits into two new species); as a result non-mutualistic species should become more common than the opposite. However, a number of recent empirical studies have found that groups that engage in cooperation are actually more diverse than groups that do not; this observation is at odds with the theory. In this project we have tried to reconcile these contradiction by investigating in finer detail the structure of the network of our study group (ants and plants). In order to do this, we have constructed a network showing which ant species interact with which plant species.
->>>>>>> 45d793efa0234913fab763262c849e71ea9c3c9b
 
 However, a number of recent empirical studies have found that groups that engage in cooperation are actually more diverse than groups that do not; this observation is at odds with the theory. In this project we have tried to reconcile these contradiction by investigating in finer detail the structure of the network of our study group (ants and plants). In order to do this, we have constructed a network showing which ant species interact with which plant species.
 
@@ -31,13 +27,16 @@ library(zoo)
 library(taRifx)
 ```
 
-## Step 1: Data Organization 
-First we need to convert the raw data into a more workable format. To do so, we have grouped the ant species and plant species together according to their abstract number for each of the three characteristics. 
+#####Step 1: Data Organization#####
+First we need to convert the raw data into a more workable format. The data comes from text-mining abstracts for co-occurrences of our trait terms of interest (seed dispersal, extrafloral nectar, and domatia and variations of those terms) and our ant and angiosperm species names. 
+
+The textmining alogorithm lumped both ant and plant species into one list so we have to separate these out. 
 
 ## SEED DISPERSAL 
+Ants disperse seeds with fleshy nutritional appendages called elaiosomes. Ants will feed on the elaiosomes or take the seed and the elaiosome back to its nest. Therefore, the seed gets dispersed for the plant partner.
 
 ## Separating columns for abstract number and genus and species name
-## Leaving NA on the left side if the abstract number is missing
+## Leaving NA on the left side if the species comes from the same abstract
 ```{r}
 sd_raw <- read.csv(file = "sd_network_tm_raw_2.csv", header = TRUE)
 
@@ -53,18 +52,19 @@ sd_tidy_table$genus <- NULL
 sd_tidy_table$species <- NULL
 ```
 
-## Filling in the NA with the abstracts above
+## Filling in the NA with the abstract number from above in order to identify which species occurred together
 ```{r}
 sd_tidy_table2 <- sd_tidy_table %>% 
                   do(na.locf(.))
 write.csv(sd_tidy_table2, file = "sd_network_tm_processed_2.csv")
 ```
 
-## Data is now prepared for process_data.R file to make 0 and 1 matrix
-## Repeat the same processes for the two other characteristics below
-
+## Data is now prepared to process the data to make 0 and 1 matrix for network analyses
+## Repeat the same processes for the two other characters below
 
 ## EXTRAFLORAL NECTAR
+Ants feed on extrafloral nectar produced by plants in extrafloral nectaries (EFNs) and they defend the plant against herbivores
+
 ```{r}
 efn_raw <- read.csv(file = "efn_network_tm_raw_2.csv", header = TRUE)
 
@@ -81,8 +81,9 @@ efn_tidy_table2 <- efn_tidy_table %>%
 write.csv(efn_tidy_table2, file = "efn_network_tm_processed_2.csv")
 ```
 
-
 #DOMATIA
+Ants nest in plant structures called domatia and defend the plant against herbivores
+
 ```{r}
 dom_raw <- read.csv(file = "dom_network_tm_raw_2.csv", header = TRUE)
 
@@ -101,11 +102,12 @@ write.csv(dom_tidy_table2, file = "dom_network_tm_processed_2.csv")
 
 
 
-## Step 2: Format data into 0 and 1 matrix for network analyses.
+##### Step 2: Format data into 0 and 1 matrix for network analyses.#####
 After the data is organized, we need to format it into a table with ant species in rows and plant species in columns. Furthermore, when an ant and plant species are found to interact, a 1 must be marked in the table.
 
-## Loading list of ants and plants to use in sorting the sd, efn, dom lists
-## Ants
+## Loading list of ants and plants to use in sorting the Seed Dispersal, EFN, and Domatia lists, this way we will know which of the identified species were ants and which were plants
+
+## Ant list
 ```{r}
 ant_list <- read.csv("worldants_specieslist.csv", header=TRUE)
 ant_list <- as.data.frame(ant_list$current.valid.name)
@@ -113,7 +115,7 @@ colnames(ant_list) <- "ants"
 levels(ant_list$ants) <- tolower(levels(ant_list$ants))
 ```
 
-## Plants
+## Plant list
 ```{r}
 angiosperms_list <- as.data.frame(read.csv("all_angiosperms.csv", header = TRUE, stringsAsFactors = FALSE))
 colnames(angiosperms_list) <- "plants"
@@ -122,7 +124,7 @@ colnames(angiosperms_list) <- "plants"
 
 ## SEED DISPERSAL
 
-## Removing abstracts that only have one species appear
+## Removing abstracts that only have one species appear because these abstracts are uninformative for interactions between ants and plants.
 ```{r}
 sd_network <- read.csv("sd_network_tm_processed_2.csv", header=TRUE)
 sd_network2 <- sd_network[sd_network$abs %in% sd_network$abs[duplicated(sd_network$abs)],]
@@ -151,15 +153,14 @@ colnames(together_sd) <- c("abs", "ants", "plants")
 together_sd$abs <- NULL
 ```
 
-## Turning table with two columns into a ) and 1 matrix
+## Turning table with two columns into a 0 and 1 matrix which is needed for network analyses
 ```{r}
 final_table_sd <- table(together_sd)
 final_table_sd <- (final_table_sd > 0) + 0
 write.csv(final_table_sd, file = "sd_01_network.csv")
 ```
 
-## Repeat the same processes for the two other characteristics below
-
+## Repeat the same processes for the two other characters below
 
 ## EXTRAFLORAL NECTAR
 ```{r}
@@ -184,7 +185,6 @@ final_table_efn <- table(together_efn)
 final_table_efn <- (final_table_efn > 0) + 0
 write.csv(final_table_efn, file = "efn_01_network.csv")
 ```
-
 
 ## DOMATIA
 ```{r}
@@ -211,3 +211,5 @@ write.csv(final_table_dom, file = "dom_01_network.csv")
 ```
 
 ## All data is now formatted into a 0 and 1 matrix, and is ready for network analyses
+
+#####Step 3: Convert matrices into networks and run network metrics###
