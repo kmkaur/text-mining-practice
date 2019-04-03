@@ -32,6 +32,8 @@ First we need to convert the raw data into a more workable format. The data come
 
 The textmining alogorithm lumped both ant and plant species into one list so we have to separate these out. 
 
+Manual checking was done on abstracts with either more than 1 plant species or more than 1 ant species in order to determine which species were actually interacting with each other and the data set was updated accordingly.
+
 ## SEED DISPERSAL 
 Ants disperse seeds with fleshy nutritional appendages called elaiosomes. Ants will feed on the elaiosomes or take the seed and the elaiosome back to its nest. Therefore, the seed gets dispersed for the plant partner.
 
@@ -213,3 +215,13 @@ write.csv(final_table_dom, file = "dom_01_network.csv")
 ## All data is now formatted into a 0 and 1 matrix, and is ready for network analyses
 
 #####Step 3: Convert matrices into networks and run network metrics###
+
+
+
+
+
+
+
+
+
+
