@@ -206,6 +206,63 @@ write.csv(final_table_dom, file = "dom_01_network.csv")
 
 #####Step 3: Convert matrices into networks and run network metrics#####
 
+##These functions were written by Pedro Jordano as part of the ggbipart R package, they are required to plot the networks
+```{r}
+bip_init_network <- function (mymat, mode1="P", mode2="A") {
+  require(network)
+  require(ggnet)
+  if(!is.matrix(mymat)) mymat <- as.matrix(mymat)
+  p<- dim(mymat)[1]    # Plants are rows
+  a<- dim(mymat)[2]    # Animals are columns
+  net<- network::network(mymat,
+                         matrix.type = "bipartite",
+                         ignore.eval = FALSE,
+                         names.eval = "weights")
+  net
+  network::set.vertex.attribute(net,"mode",c(rep(mode1,p), rep(mode2,a)))
+}
+
+bip_edgewt<- function(M, x = 30) {
+  if(!is.matrix(M)) as.matrix(M)
+  # Transpose.
+  M <- t(M)
+  # Edge list and weights.
+  M <- cbind(expand.grid(dimnames(M))[2:1], as.vector(M))
+  # Discard null weights.
+  M <- subset(M, M[, 3] != 0)
+  # Scaled weights.
+  M.scaled <- x*log(M[, 3] + 1) / max(log(M[, 3] + 1))
+  # Vector of edge weights.
+  return(M.scaled) # A numeric vector with scaled edge lengths.
+}
+
+bip_ggnet<- function(net, mat, mode= "fruchtermanreingold", size= 9,
+                     palette= col, color= "mode",
+                     label.size=3, label= F, shape= "mode",
+                     edge.label = NULL,
+                     layout.exp= 0)
+{
+  #    source("./R/bip_edgewt.R")
+  if(!is.network(net)) stop("Must first initialize the network; use 'bip_init_network.R'.")
+  #
+  # Set colors for each mode to setup a palette.
+  col= c("A"= "grey", "P"= "gold")
+  
+  pp<- ggnet2(net,
+              shape= shape,                       label= label,
+              color= color,                        palette= palette,
+              size = size,                         legend.size = 9,
+              mode = mode,                         label.size= 4,
+              layout.par = NULL,                   layout.exp = layout.exp,
+              size.legend = NA,                    label.trim = FALSE,
+              edge.lty = "solid",                  edge.label = edge.label,
+              edge.size= bip_edgewt(mat, 5),       edge.alpha= 0.25)
+  return(pp)
+}
+
+```
+
+
 ## SEED DISPERSAL
 
 ## Import matrix without species names
@@ -231,7 +288,8 @@ plot_grid(freq_p, freq_a)
 ## Plot the network
 ```{r}
 sd_net2<- bip_init_network(as.matrix(sd_net)) 
-sd_net_figure<- bip_ggnet(sd_net2, as.matrix(sd_net2), size= 0, shape= "mode", palette= col, color= "mode",layout.exp= 0.25) +
+colsd <- c("A"= "mediumseagreen", "P"= "burlywood4")
+sd_net_figure<- bip_ggnet(sd_net2, as.matrix(sd_net2), size= 0, shape= "mode", palette= colsd, color= "mode",layout.exp= 0.25) +
 geom_point(aes(color= color), size=6, color="white") +
 geom_point(aes(color= color), size= 6, alpha= 0.2) +
 geom_point(aes(color= color), size= 4) +
@@ -265,7 +323,8 @@ plot_grid(freq_p, freq_a)
 ## Plot the network
 ```{r}
 efn_net2<- bip_init_network(as.matrix(efn_net)) 
-efn_net_figure<- bip_ggnet(efn_net2, as.matrix(efn_net2), size= 0, shape= "mode", palette= col, color= "mode",layout.exp= 0.25) +
+colefn <- c("A"= "#ef8a62", "P"= "burlywood4")
+efn_net_figure<- bip_ggnet(efn_net2, as.matrix(efn_net2), size= 0, shape= "mode", palette= colefn, color= "mode",layout.exp= 0.25) +
 geom_point(aes(color= color), size=6, color="white") +
 geom_point(aes(color= color), size= 6, alpha= 0.2) +
 geom_point(aes(color= color), size= 4) +
@@ -298,8 +357,9 @@ plot_grid(freq_p, freq_a)
 
 ## Plot the network
 ```{r}
-dom_net2<- bip_init_network(as.matrix(dom_net)) 
-dom_net_figure<- bip_ggnet(dom_net2, as.matrix(dom_net2), size= 0, shape= "mode", palette= col, color= "mode",layout.exp= 0.25) +
+dom_net2<- bip_init_network(as.matrix(dom_net))
+coldom <- c("A"= "#67a9cf", "P"= "burlywood4")
+dom_net_figure<- bip_ggnet(dom_net2, as.matrix(dom_net2), size= 0, shape= "mode", palette= coldom, color= "mode",layout.exp= 0.25) +
 geom_point(aes(color= color), size=6, color="white") +
 geom_point(aes(color= color), size= 6, alpha= 0.2) +
 geom_point(aes(color= color), size= 4) +
