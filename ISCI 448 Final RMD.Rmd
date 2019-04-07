@@ -15,8 +15,6 @@ Species interactions (for example, between plants and their pollinators or preda
 
 In this project, we focus specifically on how these interactions drive evolution over very long time periods (e.g., millions of years). While there is a great deal of theory and empirical evidence supporting the importance of competitive interactions between species on shaping large-scale patterns of evolution, there is relatively little known about how the consequences of engaging in mutualistic/cooperative interactions. Mathematical theory suggests that cooperating with another species should reduce the chance that one of the partners ‘speciates’ (splits into two new species); as a result non-mutualistic species should become more common than the opposite. However, a number of recent empirical studies have found that groups that engage in cooperation are actually more diverse than groups that do not; this observation is at odds with the theory. In this project we have tried to reconcile these contradiction by investigating in finer detail the structure of the network of our study group (ants and plants). In order to do this, we have constructed a network showing which ant species interact with which plant species.
 
-However, a number of recent empirical studies have found that groups that engage in cooperation are actually more diverse than groups that do not; this observation is at odds with the theory. In this project we have tried to reconcile these contradiction by investigating in finer detail the structure of the network of our study group (ants and plants). In order to do this, we have constructed a network showing which ant species interact with which plant species.
-
 We have used computer code to “read” through thousands and thousands of scientific abstracts and pull out information on which ant species are involved in mutualistic interactions with plants (as well as which species of plants). We have then assembled this information into a database so that a network of plant-ant interactions can be built. This network will then be used in the future to address questions regarding whether mutualistic/cooperative interactions generate diversity.
 
 ## Packages used
@@ -66,10 +64,11 @@ sd_tidy_table2 <- sd_tidy_table %>%
 ```
 
 ## Data is now prepared to process the data to make 0 and 1 matrix for network analyses
-## Repeat the same processes for the two other characters below
+
+### Repeat the same processes for the two other characters below ###
 
 ## EXTRAFLORAL NECTAR
-Ants feed on extrafloral nectar produced by plants in extrafloral nectaries (EFNs) and they defend the plant against herbivores
+Ants feed on extrafloral nectar produced by plants in extrafloral nectaries (EFNs) and they defend the plant against herbivores.
 
 ```{r}
 efn_raw <- read.csv(file = "efn_network_raw.csv", header = TRUE)
@@ -87,7 +86,7 @@ efn_tidy_table2 <- efn_tidy_table %>%
 ```
 
 #DOMATIA
-Ants nest in plant structures called domatia and defend the plant against herbivores
+Ants nest in plant structures called domatia and defend the plant against herbivores.
 
 ```{r}
 dom_raw <- read.csv(file = "dom_network_raw.csv", header = TRUE)
@@ -103,8 +102,6 @@ dom_tidy_table$species <- NULL
 dom_tidy_table2 <- dom_tidy_table %>% 
   do(na.locf(.))
 ```
-
-
 
 ##### Step 2: Format data into 0 and 1 matrix for network analyses.#####
 After the data is organized, we need to format it into a table with ant species in rows and plant species in columns. Furthermore, when an ant and plant species are found to interact, a 1 must be marked in the table.
@@ -124,7 +121,6 @@ levels(ant_list$ants) <- tolower(levels(ant_list$ants))
 angiosperms_list <- as.data.frame(read.csv("all_angiosperms.csv", header = TRUE, stringsAsFactors = FALSE))
 colnames(angiosperms_list) <- "plants"
 ```
-
 
 ## SEED DISPERSAL
 
@@ -160,7 +156,7 @@ final_table_sd <- (final_table_sd > 0) + 0
 write.csv(final_table_sd, file = "sd_01_network.csv")
 ```
 
-## Repeat the same processes for the two other characters below
+### Repeat the same processes for the two other characters below ###
 
 ## EXTRAFLORAL NECTAR
 ```{r}
@@ -262,7 +258,6 @@ bip_ggnet<- function(net, mat, mode= "fruchtermanreingold", size= 9,
 
 ```
 
-
 ## SEED DISPERSAL
 
 ## Import matrix without species names
@@ -297,6 +292,8 @@ guides(color= FALSE) +
 theme(legend.position="none")
 sd_net_figure
 ```
+
+### Repeat the same processes for the two other characters below ###
 
 ## EXTRAFLORAL NECTAR
 
@@ -367,5 +364,11 @@ guides(color= FALSE) +
 theme(legend.position="none")
 dom_net_figure
 ```
+
+## Conclusions
+
+We assembled networks for our three traits of interest: seed dispersal, extrafloral nectar, and domatia. The networks for seed dispersal and extrafloral nectar are comprised of more species, and the domatia network shows several independent networks (species are less connected).
+
+These networks can now be used in simulations or to parameterize models to incorporate networks into studies of macroevolution.
 
 
