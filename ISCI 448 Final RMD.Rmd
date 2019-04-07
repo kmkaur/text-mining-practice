@@ -25,6 +25,9 @@ library(tidyr)
 library(dplyr)
 library(zoo)
 library(taRifx)
+library(bipartite)
+library(cowplot)
+library(ggplot2)
 ```
 
 #####Step 1: Data Organization#####
@@ -40,7 +43,7 @@ Ants disperse seeds with fleshy nutritional appendages called elaiosomes. Ants w
 ## Separating columns for abstract number and genus and species name
 ## Leaving NA on the left side if the species comes from the same abstract
 ```{r}
-sd_raw <- read.csv(file = "sd_network_tm_raw_2.csv", header = TRUE)
+sd_raw <- read.csv(file = "sd_network_raw.csv", header = TRUE)
 
 sd_tidy_table <- 
       sd_raw %>%
@@ -58,7 +61,6 @@ sd_tidy_table$species <- NULL
 ```{r}
 sd_tidy_table2 <- sd_tidy_table %>% 
                   do(na.locf(.))
-write.csv(sd_tidy_table2, file = "sd_network_tm_processed_2.csv")
 ```
 
 ## Data is now prepared to process the data to make 0 and 1 matrix for network analyses
@@ -68,7 +70,7 @@ write.csv(sd_tidy_table2, file = "sd_network_tm_processed_2.csv")
 Ants feed on extrafloral nectar produced by plants in extrafloral nectaries (EFNs) and they defend the plant against herbivores
 
 ```{r}
-efn_raw <- read.csv(file = "efn_network_tm_raw_2.csv", header = TRUE)
+efn_raw <- read.csv(file = "efn_network_raw.csv", header = TRUE)
 
 efn_tidy_table <- 
   efn_raw %>%
@@ -80,14 +82,13 @@ efn_tidy_table$species <- NULL
 
 efn_tidy_table2 <- efn_tidy_table %>% 
   do(na.locf(.))
-write.csv(efn_tidy_table2, file = "efn_network_tm_processed_2.csv")
 ```
 
 #DOMATIA
 Ants nest in plant structures called domatia and defend the plant against herbivores
 
 ```{r}
-dom_raw <- read.csv(file = "dom_network_tm_raw_2.csv", header = TRUE)
+dom_raw <- read.csv(file = "dom_network_raw.csv", header = TRUE)
 
 dom_tidy_table <- 
   dom_raw %>%
@@ -99,7 +100,6 @@ dom_tidy_table$species <- NULL
 
 dom_tidy_table2 <- dom_tidy_table %>% 
   do(na.locf(.))
-write.csv(dom_tidy_table2, file = "dom_network_tm_processed_2.csv")
 ```
 
 
@@ -128,20 +128,16 @@ colnames(angiosperms_list) <- "plants"
 
 ## Removing abstracts that only have one species appear because these abstracts are uninformative for interactions between ants and plants.
 ```{r}
-sd_network <- read.csv("sd_network_tm_processed_2.csv", header=TRUE)
-sd_network2 <- sd_network[sd_network$abs %in% sd_network$abs[duplicated(sd_network$abs)],]
-sd_network2$X <- NULL
+sd_network <- sd_tidy_table2[sd_tidy_table2$abs %in% sd_tidy_table2$abs[duplicated(sd_tidy_table2$abs)],]
+sd_network$X <- NULL
 ```
 
 ## Sorting into two lists, one with the ants that appeared and one with the plants that appeared
 ```{r}
-ants_sd <- sd_network2 %>% filter(name %in% ant_list$ants)
+ants_sd <- sd_network %>% filter(name %in% ant_list$ants)
 ants_sd <- remove.factors(ants_sd)
-plants_sd <- sd_network2 %>% filter(name %in% angiosperms_list$plants)
+plants_sd <- sd_network %>% filter(name %in% angiosperms_list$plants)
 plants_sd <- remove.factors(plants_sd)
-
-write.csv(ants_sd, file = "seed_dispersal_ants_2.csv")
-write.csv(plants_sd, file = "seed_dispersal_plants_2.csv")
 ```
 
 ## Merging into one table with the columns labelled abstracts, ants, and plants
@@ -166,20 +162,16 @@ write.csv(final_table_sd, file = "sd_01_network.csv")
 
 ## EXTRAFLORAL NECTAR
 ```{r}
-efn_network <- read.csv("efn_network_tm_processed_2.csv", header=TRUE)
-efn_network2 <- efn_network[efn_network$abs %in% efn_network$abs[duplicated(efn_network$abs)],]
-efn_network2$X <- NULL
+efn_network <- efn_tidy_table2[efn_tidy_table2$abs %in% efn_tidy_table2$abs[duplicated(efn_tidy_table2$abs)],]
+efn_network$X <- NULL
 
-ants_efn <- efn_network2 %>% filter(name %in% ant_list$ants)
+ants_efn <- efn_network %>% filter(name %in% ant_list$ants)
 ants_efn <- remove.factors(ants_efn)
-plants_efn <- efn_network2 %>% filter(name %in% angiosperms_list$plants)
+plants_efn <- efn_network %>% filter(name %in% angiosperms_list$plants)
 plants_efn <- remove.factors(plants_efn)
 
 together_efn <- merge(ants_efn, plants_efn, by="abs")
 colnames(together_efn) <- c("abs", "ants", "plants")
-
-write.csv(ants_efn, file = "efn_ants_2.csv")
-write.csv(plants_efn, file = "efn_plants_2.csv")
 
 together_efn$abs <- NULL
 
@@ -190,17 +182,13 @@ write.csv(final_table_efn, file = "efn_01_network.csv")
 
 ## DOMATIA
 ```{r}
-dom_network <- read.csv("dom_network_tm_processed_2.csv", header=TRUE)
-dom_network2 <- dom_network[dom_network$abs %in% dom_network$abs[duplicated(dom_network$abs)],]
-dom_network2$X <- NULL
+dom_network <- dom_tidy_table2[dom_tidy_table2$abs %in% dom_tidy_table2$abs[duplicated(dom_tidy_table2$abs)],]
+dom_network$X <- NULL
 
-ants_dom <- dom_network2 %>% filter(name %in% ant_list$ants)
+ants_dom <- dom_network %>% filter(name %in% ant_list$ants)
 ants_dom <- remove.factors(ants_dom)
-plants_dom <- dom_network2 %>% filter(name %in% angiosperms_list$plants)
+plants_dom <- dom_network %>% filter(name %in% angiosperms_list$plants)
 plants_dom <- remove.factors(plants_dom)
-
-write.csv(ants_dom, file = "domatia_ants_2.csv")
-write.csv(plants_dom, file = "domatia_plants_2.csv")
 
 together_dom <- merge(ants_dom, plants_dom, by="abs")
 colnames(together_dom) <- c("abs", "ants", "plants")
@@ -214,14 +202,123 @@ write.csv(final_table_dom, file = "dom_01_network.csv")
 
 ## All data is now formatted into a 0 and 1 matrix, and is ready for network analyses
 
-#####Step 3: Convert matrices into networks and run network metrics###
+#####Step 3: Convert matrices into networks and run network metrics#####
 
+#these are written by Pedro Jordano
+bip_init_network <- function (mymat, mode1="P", mode2="A") {
+  require(network)
+  require(ggnet)
+  if(!is.matrix(mymat)) mymat <- as.matrix(mymat)
+  p<- dim(mymat)[1]    # Plants are rows
+  a<- dim(mymat)[2]    # Animals are columns
+  net<- network::network(mymat,
+                         matrix.type = "bipartite",
+                         ignore.eval = FALSE,
+                         names.eval = "weights")
+  net
+  network::set.vertex.attribute(net,"mode",c(rep(mode1,p), rep(mode2,a)))
+}
 
+## SEED DISPERSAL
 
+## Import matrix without species names
+```{r}
+sd_net <- read.csv(file = "sd_01.csv", header = FALSE)
+sd_net <- as.matrix(sd_net)
+dimnames(sd_net) <- list(1:87, 1:102) #req'd for bipartite functions
+```
 
+## The following function test how well the data fits a power law distribution
+```{r}
+law_sd <- degreedistr(sd_net)
+```
 
+## Plotting the number of interactions
+```{r}
+sl_sd <- specieslevel(sd_net)
+freq_p <- qplot(sl_sd$`higher level`$degree, geom="histogram", binwidth = 0.5, xlab = "k - Plants", ylab = "Frequency") 
+freq_a <- qplot(sl_sd$`lower level`$degree, geom="histogram", binwidth = 0.5, xlab = "k - Ants", ylab = "Frequency") 
+plot_grid(freq_p, freq_a)
+```
 
+## Plot the network
+```{r}
+sd_net2<- bip_init_network(as.matrix(sd_net)) 
+sd_net_figure<- bip_ggnet(sd_net2, as.matrix(sd_net2), size= 0, shape= "mode", palette= col, color= "mode",layout.exp= 0.25) +
+geom_point(aes(color= color), size=6, color="white") +
+geom_point(aes(color= color), size= 6, alpha= 0.2) +
+geom_point(aes(color= color), size= 4) +
+guides(color= FALSE) +
+theme(legend.position="none")
+sd_net_figure
+```
 
+## EXTRAFLORAL NECTAR
 
+## Import matrix without species names
+```{r}
+efn_net <- read.csv(file = "efn_01.csv", header = FALSE)
+efn_net <- as.matrix(efn_net)
+dimnames(efn_net) <- list(1:92, 1:93) #req'd for bipartite functions
+```
+
+## The following function test how well the data fits a power law distribution
+```{r}
+law_efn <- degreedistr(efn_net)
+```
+
+## Plotting the number of interactions
+```{r}
+sl_efn <- specieslevel(efn_net)
+freq_p <- qplot(sl_efn$`higher level`$degree, geom="histogram", binwidth = 0.5, xlab = "k - Plants", ylab = "Frequency") 
+freq_a <- qplot(sl_efn$`lower level`$degree, geom="histogram", binwidth = 0.5, xlab = "k - Ants", ylab = "Frequency") 
+plot_grid(freq_p, freq_a)
+```
+
+## Plot the network
+```{r}
+efn_net2<- bip_init_network(as.matrix(efn_net)) 
+efn_net_figure<- bip_ggnet(efn_net2, as.matrix(efn_net2), size= 0, shape= "mode", palette= col, color= "mode",layout.exp= 0.25) +
+geom_point(aes(color= color), size=6, color="white") +
+geom_point(aes(color= color), size= 6, alpha= 0.2) +
+geom_point(aes(color= color), size= 4) +
+guides(color= FALSE) +
+theme(legend.position="none")
+efn_net_figure
+```
+
+## DOMATIA
+
+## Import matrix without species names
+```{r}
+dom_net <- read.csv(file = "dom_01.csv", header = FALSE)
+dom_net <- as.matrix(dom_net)
+dimnames(dom_net) <- list(1:46, 1:40) #req'd for bipartite functions
+```
+
+## The following function test how well the data fits a power law distribution
+```{r}
+law_dom <- degreedistr(dom_net)
+```
+
+## Plotting the number of interactions
+```{r}
+sl_dom <- specieslevel(dom_net)
+freq_p <- qplot(sl_dom$`higher level`$degree, geom="histogram", binwidth = 0.5, xlab = "k - Plants", ylab = "Frequency") 
+freq_a <- qplot(sl_dom$`lower level`$degree, geom="histogram", binwidth = 0.5, xlab = "k - Ants", ylab = "Frequency") 
+plot_grid(freq_p, freq_a)
+```
+
+## Plot the network
+```{r}
+dom_net2<- bip_init_network(as.matrix(dom_net)) 
+dom_net_figure<- bip_ggnet(dom_net2, as.matrix(dom_net2), size= 0, shape= "mode", palette= col, color= "mode",layout.exp= 0.25) +
+geom_point(aes(color= color), size=6, color="white") +
+geom_point(aes(color= color), size= 6, alpha= 0.2) +
+geom_point(aes(color= color), size= 4) +
+guides(color= FALSE) +
+theme(legend.position="none")
+dom_net_figure
+```
 
 
